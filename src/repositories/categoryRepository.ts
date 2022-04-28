@@ -1,8 +1,7 @@
 import client from "../database.js";
 
 async function getByName(name: string) {
-  const formatName = name.toLowerCase();
-  const category = await client.categories.findUnique({ where: { name: formatName } });
+  const category = await client.categories.findUnique({ where: { name } });
   return category;
 }
 
@@ -12,8 +11,14 @@ async function insert(name: string) {
   return category;
 }
 
+async function get() {
+  const categories = await client.categories.findMany({});
+  return categories;
+}
+
 const categoryRepository = {
   insert,
   getByName,
+  get,
 };
 export default categoryRepository;

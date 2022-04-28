@@ -13,21 +13,17 @@ export interface InsertTestsData {
 
 export type formatInsertData = Omit<tests, "id">;
 
-export async function insert(data: formatInsertData) {
+async function insert(data: formatInsertData) {
   await client.tests.create({ data });
 }
 
-export async function getAll() {
+async function getAll() {
   const tests = await client.tests.findMany({
     include: {
       category: true,
       teacherDiscipline: {
         include: {
-          discipline: {
-            include: {
-              term: true,
-            },
-          },
+          discipline: true,
           teacher: true,
         },
       },
@@ -35,3 +31,9 @@ export async function getAll() {
   });
   return tests;
 }
+
+const testsRepository = {
+  insert,
+  getAll,
+};
+export default testsRepository;

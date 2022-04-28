@@ -6,7 +6,13 @@ async function insert(req: Request, res: Response) {
   res.sendStatus(201);
 }
 
+async function get(req: Request, res: Response) {
+  const disciplines = await disciplinesService.get();
+  res.send(disciplines);
+}
+
 const disciplineController = {
   insert,
+  get,
 };
 export default disciplineController;

@@ -6,6 +6,8 @@ import nameSchema from "../schemas/nameSchema.js";
 
 const teachersRouter = Router();
 
+teachersRouter.get("/teachers", validateAuth, teachersController.get);
+
 teachersRouter.post(
   "/teachers",
   validateAuth,

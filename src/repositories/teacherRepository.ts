@@ -3,7 +3,7 @@ import client from "../database.js";
 
 export type insertTeacherData = Omit<teachers, "id">;
 
-async function getAll() {
+async function get() {
   const teachers = client.teachers.findMany();
   return teachers;
 }
@@ -26,23 +26,9 @@ async function insert(name: string) {
   return teacher;
 }
 
-// export async function getTeacherDisciplineByIds(teacherId: number, disciplineId: number) {
-//   const teacherDiscipline = client.teachersDiciplines.findFirst({
-//     where: { AND: [{ teacherId }, { disciplineId }] },
-//   });
-//   return teacherDiscipline;
-// }
-
-// // async function insertTeacherDiscipline(teacherId: number, disciplineId: number) {
-// //   const teacherDiscipline = client.teachersDiciplines.create({
-// //     data: { teacherId, disciplineId },
-// //   });
-// //   return teacherDiscipline;
-// }
-
 const teacherRepository = {
   insert,
-  getAll,
+  get,
   getByName,
   searchName,
 };

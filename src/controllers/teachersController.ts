@@ -6,7 +6,13 @@ async function insert(req: Request, res: Response) {
   res.sendStatus(201);
 }
 
+async function get(req: Request, res: Response) {
+  const teachers = await teachersService.get();
+  res.send(teachers);
+}
+
 const teachersController = {
   insert,
+  get,
 };
 export default teachersController;

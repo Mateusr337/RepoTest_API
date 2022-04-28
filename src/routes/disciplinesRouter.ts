@@ -13,4 +13,6 @@ disciplinesRouter.post(
   disciplineController.insert
 );
 
+disciplinesRouter.get("/disciplines", validateAuth, disciplineController.get);
+
 export default disciplinesRouter;

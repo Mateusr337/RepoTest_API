@@ -6,6 +6,8 @@ import nameSchema from "../schemas/nameSchema.js";
 
 const categoryRouter = Router();
 
+categoryRouter.get("/categories", validateAuth, categoryController.get);
+
 categoryRouter.post(
   "/categories",
   validateAuth,

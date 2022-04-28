@@ -1,28 +1,20 @@
 import { Router } from "express";
-import * as authController from "../controllers/authController.js";
-import * as testsController from "../controllers/testsController.js";
 import validateSchemaMiddleware from "../middlewares/validateSchemaMiddleware.js";
 import testSchema from "../schemas/testSchema.js";
 import multer from "multer";
-import supabase from "../supabase.js";
-const upload = multer({ dest: "./src/uploads/" });
+import validateAuth from "../middlewares/validateAuthenticatedMiddleware.js";
+import multerConfig from "../middlewares/multerMiddleware.js";
+import testsController from "../controllers/testsController.js";
 
 const testsRouter = Router();
 
 testsRouter.post(
   "/tests",
-  // authController.validateToken,
-  // validateSchemaMiddleware(testSchema),
-  upload.single("file"),
-  async (req, res) => {
-    const file: any = req.file;
-    const { data, error } = await supabase.storage.from("pdfs").upload("file1.pdf", file);
-    console.log(data, error);
-    console.log(req.body.name);
-    res.sendStatus(200);
-  }
-  // testsController.insert
+  validateAuth,
+  multer(multerConfig).single("pdf"),
+  validateSchemaMiddleware(testSchema),
+  testsController.insert
 );
-testsRouter.get("/tests", authController.validateToken, testsController.findAll);
+testsRouter.get("/tests", validateAuth, () => {});
 
 export default testsRouter;
