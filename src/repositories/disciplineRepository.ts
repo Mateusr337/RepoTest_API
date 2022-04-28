@@ -3,7 +3,7 @@ import client from "../database.js";
 
 export type insertDisciplineData = Omit<disciplines, "id">;
 
-export async function getByName(name: string) {
+async function findByName(name: string) {
   const nameLowerCase = name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -13,7 +13,7 @@ export async function getByName(name: string) {
   return discipline;
 }
 
-export async function insert(data: insertDisciplineData) {
+async function insert(data: insertDisciplineData) {
   data.name = data.name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -23,10 +23,8 @@ export async function insert(data: insertDisciplineData) {
   return discipline;
 }
 
-export async function getByNamePartial(name: string) {
-  const disciplines = await client.disciplines.findMany({
-    where: { name: { contains: name } },
-    include: { term: true },
-  });
-  return disciplines;
-}
+const disciplinesRepository = {
+  insert,
+  findByName,
+};
+export default disciplinesRepository;
