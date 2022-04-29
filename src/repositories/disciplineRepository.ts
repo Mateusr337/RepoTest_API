@@ -13,8 +13,12 @@ async function getByName(name: string) {
   return discipline;
 }
 
-async function get() {
-  const disciplines = await client.disciplines.findMany();
+async function get(term: string) {
+  const disciplines = await client.disciplines.findMany({
+    where: {
+      term,
+    },
+  });
   return disciplines;
 }
 

@@ -7,7 +7,8 @@ async function insert(req: Request, res: Response) {
 }
 
 async function get(req: Request, res: Response) {
-  const disciplines = await disciplinesService.get();
+  const term = req.query.term?.toString();
+  const disciplines = await disciplinesService.get(term);
   res.send(disciplines);
 }
 

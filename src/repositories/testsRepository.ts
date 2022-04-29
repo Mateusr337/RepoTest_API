@@ -17,7 +17,7 @@ async function insert(data: formatInsertData) {
   await client.tests.create({ data });
 }
 
-async function getAll() {
+async function get(discipline: string, category: string) {
   const tests = await client.tests.findMany({
     include: {
       category: true,
@@ -28,12 +28,62 @@ async function getAll() {
         },
       },
     },
+    where: {
+      OR: [
+        {
+          category: {
+            name: category,
+          },
+        },
+        {
+          teacherDiscipline: {
+            discipline: {
+              name: discipline,
+            },
+          },
+        },
+      ],
+    },
+  });
+  return tests;
+}
+
+async function getSearch(discipline: string, teacher: string) {
+  const tests = await client.tests.findMany({
+    include: {
+      category: true,
+      teacherDiscipline: {
+        include: {
+          discipline: true,
+          teacher: true,
+        },
+      },
+    },
+    where: {
+      AND: [
+        {
+          teacherDiscipline: {
+            discipline: {
+              name: { contains: discipline },
+            },
+          },
+        },
+        {
+          teacherDiscipline: {
+            teacher: {
+              name: { contains: teacher },
+            },
+          },
+        },
+      ],
+    },
   });
   return tests;
 }
 
 const testsRepository = {
   insert,
-  getAll,
+  get,
+  getSearch,
 };
 export default testsRepository;

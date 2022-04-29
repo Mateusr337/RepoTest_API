@@ -36,6 +36,16 @@ async function insertFileSupabase(file: any) {
   return data;
 }
 
+async function get(discipline: string, category: string, search: string, teacher: string) {
+  let tests = [];
+  if (search) {
+    tests = await testsRepository.getSearch(discipline, teacher);
+  } else {
+    tests = await testsRepository.get(discipline, category);
+  }
+  return tests;
+}
+
 async function returnTeachersDisciplines(teacherId: number, disciplineId: number) {
   let teachersDisciplines = await teachersDisciplinesService.getTeacherDisciplineByIds(
     teacherId,
@@ -51,5 +61,6 @@ async function returnTeachersDisciplines(teacherId: number, disciplineId: number
 
 const testsService = {
   insert,
+  get,
 };
 export default testsService;

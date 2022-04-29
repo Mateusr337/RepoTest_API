@@ -15,6 +15,6 @@ testsRouter.post(
   validateSchemaMiddleware(testSchema),
   testsController.insert
 );
-testsRouter.get("/tests", validateAuth, () => {});
+testsRouter.get("/tests", validateAuth, testsController.get);
 
 export default testsRouter;
