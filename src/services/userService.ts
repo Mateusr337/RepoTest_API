@@ -7,8 +7,16 @@ async function insert(signUpData: usersInsertData) {
   const users = await userRepository.find({ email: signUpData.email });
   if (users.length > 0) throw errors.conflictRequestError("email");
 
+  validatePassword(signUpData.password);
+
   signUpData.password = encryptFunctions.encryptData(signUpData.password);
   await userRepository.insert(signUpData);
+}
+
+function validatePassword(password: string) {
+  const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])(?:([0-9a-zA-Z$*&@#])(?!\1)){8,}$/;
+  const validation = pattern.test(password);
+  if (!validation) throw errors.badRequestError("password");
 }
 
 async function validateUserById(id: number) {

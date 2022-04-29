@@ -33,11 +33,15 @@ async function main() {
   }
 }
 
-main()
-  .catch((e) => {
-    console.log(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await client.$disconnect();
-  });
+export default function seed() {
+  main()
+    .catch((e) => {
+      console.log(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await client.$disconnect();
+    });
+}
+
+seed();

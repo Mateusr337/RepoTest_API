@@ -8,14 +8,14 @@ async function register(req: Request, res: Response) {
 
 async function login(req: Request, res: Response) {
   const token = await userService.login(req.body);
-  res.send(token);
+  res.send({ token: token });
 }
 
 async function loginWithGithub(req: Request, res: Response) {
   const { email } = req.body;
 
   const token = await userService.loginWithGithub(email);
-  res.send(token);
+  res.send({ token: token });
 }
 
 const userController = {
