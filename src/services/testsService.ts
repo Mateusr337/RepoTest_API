@@ -41,7 +41,7 @@ async function get(discipline: string, category: string, search: string, teacher
   if (search) {
     tests = await testsRepository.getSearch(discipline, teacher);
   } else {
-    tests = await testsRepository.get(discipline, category);
+    tests = await testsRepository.get(discipline, category, teacher);
   }
   return tests;
 }

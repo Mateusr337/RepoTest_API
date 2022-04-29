@@ -17,7 +17,7 @@ async function insert(data: formatInsertData) {
   await client.tests.create({ data });
 }
 
-async function get(discipline: string, category: string) {
+async function get(discipline: string, category: string, teacher: string) {
   const tests = await client.tests.findMany({
     include: {
       category: true,
@@ -39,6 +39,13 @@ async function get(discipline: string, category: string) {
           teacherDiscipline: {
             discipline: {
               name: discipline,
+            },
+          },
+        },
+        {
+          teacherDiscipline: {
+            teacher: {
+              name: teacher,
             },
           },
         },
