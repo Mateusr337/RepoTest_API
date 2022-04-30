@@ -102,14 +102,73 @@ describe("testing page: /sign-in", () => {
 });
 
 describe("testing router: /categories", () => {
-  beforeEach(() => seed());
-
   describe("GET /categories", () => {
-    it("should answer not null array", async () => {
-      const { token, user } = await CreateUserToken();
+    it("should answer with not null array", async () => {
+      const { headers } = await CreateUserToken();
 
-      const categories = await agent.get("/categories").set({ token });
-      expect(categories.body.categories).toBeGreaterThan(0);
+      const response = await agent.get("/categories").set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe("testing router: /disciplines", () => {
+  describe("GET /disciplines", () => {
+    it("should answer with not null array", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent
+        .get("/disciplines")
+        .set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it("should answer with not null array", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/categories").set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe("testing router: /teachers", () => {
+  describe("GET /teachers", () => {
+    it("should answer with not null array", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/teachers").set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe("testing router: /tests", () => {
+  describe("GET /tests", () => {
+    it("should answer with not null array", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/tests").set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toEqual(0);
+    });
+
+    it("should answer with not null array - query", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/tests").set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toEqual(0);
     });
   });
 });

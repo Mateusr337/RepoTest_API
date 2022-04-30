@@ -36,13 +36,12 @@ export async function CreateUserToken() {
   const token: string = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, expiration);
 
   const session = await client.sessions.create({ data: { token } });
-  const configToken = config(token);
+  const headers = config(token);
 
-  return { user, token: configToken, session };
+  return { user, headers, session };
 }
 
 const config = (token: string) => {
-  return {
-    headers: { Authorization: `Bearer ${token}` },
-  };
+  const headers = { Authorization: `Bearer ${token}` };
+  return headers;
 };

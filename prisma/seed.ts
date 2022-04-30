@@ -1,7 +1,7 @@
 import client from "../src/database.js";
 import { disciplines, teachers } from "./constants.js";
 
-async function main() {
+export default async function seed() {
   for (let i = 1; i <= 5; i++) {
     await client.categories.upsert({
       where: { name: `P${i}` },
@@ -33,15 +33,11 @@ async function main() {
   }
 }
 
-export default function seed() {
-  main()
-    .catch((e) => {
-      console.log(e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await client.$disconnect();
-    });
-}
-
-seed();
+seed()
+  .catch((e) => {
+    console.log(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await client.$disconnect();
+  });

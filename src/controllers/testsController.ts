@@ -17,8 +17,17 @@ async function get(req: Request, res: Response) {
   res.send(tests);
 }
 
+async function putViews(req: Request, res: Response) {
+  const { views } = req.body;
+  const { id } = req.params;
+
+  await testsService.putViews(views.toString() as string, parseInt(id) as number);
+  res.sendStatus(204);
+}
+
 const testsController = {
   insert,
   get,
+  putViews,
 };
 export default testsController;

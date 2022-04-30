@@ -1,5 +1,5 @@
 import testsRepository from "../repositories/testsRepository.js";
-import supabase from "../supabase.js";
+import supabaseBucket from "../supabase.js";
 import errors from "../utils/errorFunctions.js";
 import categoryService from "./categoryService.js";
 import disciplinesService from "./disciplinesService.js";
@@ -19,21 +19,32 @@ async function insert(body: any, file: any) {
   if (!foundDiscipline) throw errors.notFoundError("discipline");
 
   const teachersDisciplines = await returnTeachersDisciplines(foundTeacher.id, foundDiscipline.id);
-  const { Key: fileKey } = await insertFileSupabase(file);
+  const url = await insertFileSupabase(file);
 
   await testsRepository.insert({
     name,
-    pdfUrl: fileKey,
+    pdfUrl: url,
     categoryId: foundCategory.id,
     teacherDisciplineId: teachersDisciplines.id,
+    views: "0",
   });
 }
 
 async function insertFileSupabase(file: any) {
-  const { data, error } = await supabase.storage.from("pdfs").upload(`${file.filename}`, file);
-  if (error) throw new Error("error with supabase");
+  const fileName = `public/${Date.now()}-${file.originalname}`;
 
-  return data;
+  try {
+    const { data } = await supabaseBucket.upload(fileName, file.buffer, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: "application/pdf",
+    });
+    const { publicURL } = supabaseBucket.getPublicUrl(data.Key.replace("repo-test/", ""));
+
+    return publicURL;
+  } catch {
+    new Error("Supabase error");
+  }
 }
 
 async function get(discipline: string, category: string, search: string, teacher: string) {
@@ -59,8 +70,24 @@ async function returnTeachersDisciplines(teacherId: number, disciplineId: number
   return teachersDisciplines;
 }
 
+async function putViews(views: string, id: number) {
+  const test = await getById(id);
+
+  if (parseInt(views) < 1) throw errors.badRequestError("view value");
+
+  await testsRepository.putViews(views, id);
+}
+
+async function getById(id: number) {
+  const test = await testsRepository.getById(id);
+  if (!test) throw errors.notFoundError("test");
+  return test;
+}
+
 const testsService = {
   insert,
   get,
+  getById,
+  putViews,
 };
 export default testsService;

@@ -30,6 +30,7 @@ model tests {
   category            categories         @relation(fields: [categoryId], references: [id])
   teacherDisciplineId Int
   teacherDiscipline   teachersDiciplines @relation(fields: [teacherDisciplineId], references: [id])
+  views               String             @default("0")
 }
 
 model teachersDiciplines {

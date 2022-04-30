@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "tests" ALTER COLUMN "views" SET DEFAULT E'0',
+ALTER COLUMN "views" SET DATA TYPE TEXT;

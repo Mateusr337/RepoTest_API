@@ -5,8 +5,6 @@ export interface InsertTestsData {
   name: string;
   pdfUrl: string;
   category: string;
-  rec: "yes" | "no";
-  term: string;
   teacher: string;
   discipline: string;
 }
@@ -14,7 +12,14 @@ export interface InsertTestsData {
 export type formatInsertData = Omit<tests, "id">;
 
 async function insert(data: formatInsertData) {
-  await client.tests.create({ data });
+  await client.tests.create({ data: { ...data } });
+}
+
+async function putViews(views: string, id: number) {
+  await client.tests.update({
+    where: { id },
+    data: { views },
+  });
 }
 
 async function get(discipline: string, category: string, teacher: string) {
@@ -55,6 +60,11 @@ async function get(discipline: string, category: string, teacher: string) {
   return tests;
 }
 
+async function getById(id: number) {
+  const test = await client.tests.findUnique({ where: { id } });
+  return test;
+}
+
 async function getSearch(discipline: string, teacher: string) {
   const tests = await client.tests.findMany({
     include: {
@@ -92,5 +102,7 @@ const testsRepository = {
   insert,
   get,
   getSearch,
+  putViews,
+  getById,
 };
 export default testsRepository;
