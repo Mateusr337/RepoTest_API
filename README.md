@@ -1,6 +1,5 @@
 # RepoTest
 
-![repoTest](https://user-images.githubusercontent.com/92904799/166160323-dcb75d57-b1e1-44c2-950d-c3a6e70f8f00.gif)
 
 ##  :link: About
 
