@@ -1,7 +1,9 @@
+import { type } from "os";
 import supertest from "supertest";
 import seed from "../prisma/seed";
 import app from "../src/app";
 import client from "../src/database";
+import { createInsertTestData, insertTestCreateUserToken } from "./factories/testFactory";
 import { createUser, createUserData, CreateUserToken } from "./factories/userFactory";
 
 const agent = supertest(app);
@@ -10,7 +12,8 @@ async function truncate(table: string) {
   await client.$executeRawUnsafe(`TRUNCATE TABLE ${table};`);
 }
 
-afterAll(async () => client.$disconnect());
+afterEach(async () => client.$disconnect());
+beforeEach((done) => done());
 
 describe("testing page: /sign-up", () => {
   beforeEach(async () => await truncate("users"));
@@ -106,10 +109,19 @@ describe("testing router: /categories", () => {
     it("should answer with not null array", async () => {
       const { headers } = await CreateUserToken();
 
-      const response = await agent.get("/categories").set({ Authorization: headers.Authorization });
+      const response = await agent.get("/categories").set({ ...headers });
 
       expect(response.status).toEqual(200);
       expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it("should answer with status code 401", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/categories").set({});
+
+      expect(response.status).toEqual(401);
+      expect(response.body).toEqual({});
     });
   });
 });
@@ -127,13 +139,13 @@ describe("testing router: /disciplines", () => {
       expect(response.body.length).toBeGreaterThan(0);
     });
 
-    it("should answer with not null array", async () => {
+    it("should answer with status code 401", async () => {
       const { headers } = await CreateUserToken();
 
-      const response = await agent.get("/categories").set({ Authorization: headers.Authorization });
+      const response = await agent.get("/categories").set({});
 
-      expect(response.status).toEqual(200);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.status).toEqual(401);
+      expect(response.body).toEqual({});
     });
   });
 });
@@ -143,32 +155,214 @@ describe("testing router: /teachers", () => {
     it("should answer with not null array", async () => {
       const { headers } = await CreateUserToken();
 
-      const response = await agent.get("/teachers").set({ Authorization: headers.Authorization });
+      const response = await agent.get("/teachers").set({ ...headers });
 
       expect(response.status).toEqual(200);
       expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it("should answer with status code 401", async () => {
+      const { headers } = await CreateUserToken();
+
+      const response = await agent.get("/teachers").set({});
+
+      expect(response.status).toEqual(401);
+      expect(response.body).toEqual({});
     });
   });
 });
 
 describe("testing router: /tests", () => {
+  beforeEach(async () => truncate("tests"));
+
+  describe("POST /test", () => {
+    it("should answer with status code 201", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", category.name)
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(201);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(1);
+    });
+
+    it("should answer with status code 401", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: "bananinha", "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", category.name)
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(401);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+
+    it("should answer with status code 422 - wrong body", async () => {
+      const { user, headers } = await CreateUserToken();
+
+      const response = await agent
+        .post("/tests")
+        .set({ ...headers })
+        .send({});
+
+      expect(response.status).toEqual(422);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+
+    it("should answer with status code 404 - not found category", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", "banana")
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(404);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+
+    it("should answer with status code 404 - not found discipline", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", "bananinha")
+        .field("category", category.name)
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(404);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+
+    it("should answer with status code 404 - not found teacher", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", category.name)
+        .field("teacher", "bananinha")
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(404);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+  });
+
   describe("GET /tests", () => {
+    beforeEach(async () => truncate("tests"));
+
     it("should answer with not null array", async () => {
       const { headers } = await CreateUserToken();
 
-      const response = await agent.get("/tests").set({ Authorization: headers.Authorization });
+      const response = await agent.get("/tests").set({ ...headers });
 
       expect(response.status).toEqual(200);
       expect(response.body.length).toEqual(0);
     });
 
-    it("should answer with not null array - query", async () => {
+    it("should answer with status code 401", async () => {
       const { headers } = await CreateUserToken();
 
-      const response = await agent.get("/tests").set({ Authorization: headers.Authorization });
+      const response = await agent.get("/tests").set({});
+
+      expect(response.status).toEqual(401);
+    });
+
+    it("should answer with not null array - category filter", async () => {
+      const { user, headers, test } = await insertTestCreateUserToken();
+
+      const category = await client.categories.findUnique({ where: { id: test.categoryId } });
+
+      const response = await agent.get(`/tests?category=${category.name}`).set({ ...headers });
 
       expect(response.status).toEqual(200);
-      expect(response.body.length).toEqual(0);
+      expect(response.body).not.toBeNull();
+    });
+
+    it("should answer with not null array - discipline filter", async () => {
+      const { user, headers, test } = await insertTestCreateUserToken();
+
+      const teachersDisciplines = await client.teachersDiciplines.findUnique({
+        where: { id: test.teacherDisciplineId },
+      });
+
+      const discipline = await client.disciplines.findUnique({
+        where: { id: teachersDisciplines.disciplineId },
+      });
+
+      const response = await agent.get(`/tests?discipline=${discipline.name}`).set({ ...headers });
+
+      expect(response.status).toEqual(200);
+      expect(response.body).not.toBeNull();
+
+      const responseSearch = await agent
+        .get(`/tests?discipline=${discipline.name[0]}&search=yes`)
+        .set({ ...headers });
+
+      expect(responseSearch.status).toEqual(200);
+      expect(responseSearch.body).not.toBeNull();
+    });
+
+    it("should answer with not null array - teacher filter", async () => {
+      const { user, headers, test } = await insertTestCreateUserToken();
+
+      const teachersDisciplines = await client.teachersDiciplines.findUnique({
+        where: { id: test.teacherDisciplineId },
+      });
+
+      const teacher = await client.teachers.findUnique({
+        where: { id: teachersDisciplines.teacherId },
+      });
+
+      const response = await agent.get(`/tests?teacher=${teacher.name}`).set({ ...headers });
+
+      expect(response.status).toEqual(200);
+      expect(response.body).not.toBeNull();
+
+      const responseSearch = await agent
+        .get(`/tests?teacher=${teacher.name[0]}&search=yes`)
+        .set({ ...headers });
+
+      expect(responseSearch.status).toEqual(200);
+      expect(responseSearch.body).not.toBeNull();
     });
   });
 });

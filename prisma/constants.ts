@@ -1,4 +1,4 @@
-export const teachers = ["Olinda", "margarete", "pedro", "dina", "marcos", "yann", "leo/celso"];
+export const teachers = ["olinda", "margarete", "pedro", "dina", "marcos", "yann", "leo/celso"];
 
 export const disciplines = [
   {
@@ -14,7 +14,7 @@ export const disciplines = [
     term: "2",
   },
   {
-    name: "CTA",
+    name: "cta",
     term: "7",
   },
   {
