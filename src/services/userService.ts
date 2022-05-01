@@ -1,3 +1,4 @@
+import { usersPartial } from "./../repositories/userRepository";
 import jwt from "jsonwebtoken";
 import userRepository, { usersInsertData } from "../repositories/userRepository.js";
 import encryptFunctions from "../utils/encryptFunction.js";
@@ -23,6 +24,11 @@ async function validateUserById(id: number) {
   const user = await userRepository.findById(id);
   if (!user) throw errors.notFoundError("id");
   return user;
+}
+
+async function find(filters: usersPartial) {
+  const users = await userRepository.find({});
+  return users;
 }
 
 async function login(data: usersInsertData) {
@@ -62,6 +68,7 @@ const userService = {
   loginWithGithub,
   findSessionById,
   login,
+  find,
 };
 
 export default userService;

@@ -6,7 +6,7 @@ function errorHandlingMiddleware(error: any, req: Request, res: Response, next: 
   if (error.type === "unauthorized") return res.status(401).send(error.message);
   if (error.type === "error_conflict") return res.status(409).send(error.message);
 
-  console.log(error.message);
+  console.log(error);
   return res.sendStatus(500);
 }
 

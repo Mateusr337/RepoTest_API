@@ -5,6 +5,9 @@ import categoryService from "./categoryService.js";
 import disciplinesService from "./disciplinesService.js";
 import teachersDisciplinesService from "./teachersDisciplineService.js";
 import teachersService from "./teachersService.js";
+import sendEmail from "../utils/sendEmails.js";
+import userService from "./userService.js";
+import { tests } from "@prisma/client";
 
 async function insert(body: any, file: any) {
   const { category, teacher, discipline, name } = body;
@@ -24,13 +27,22 @@ async function insert(body: any, file: any) {
   const teachersDisciplines = await returnTeachersDisciplines(foundTeacher.id, foundDiscipline.id);
   const url = await insertFileSupabase(file);
 
-  await testsRepository.insert({
+  const test = await testsRepository.insert({
     name,
     pdfUrl: url,
     categoryId: foundCategory.id,
     teacherDisciplineId: teachersDisciplines.id,
     views: "0",
   });
+
+  await sendEmailsToUsers(test);
+}
+
+async function sendEmailsToUsers(test: tests) {
+  const users = await userService.find({});
+  const emailsOfUsers = users.map((user) => user.email);
+
+  await sendEmail(emailsOfUsers, test);
 }
 
 async function insertFileSupabase(file: any) {

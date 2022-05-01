@@ -12,7 +12,8 @@ export interface InsertTestsData {
 export type formatInsertData = Omit<tests, "id">;
 
 async function insert(data: formatInsertData) {
-  await client.tests.create({ data: { ...data } });
+  const test = await client.tests.create({ data: { ...data } });
+  return test;
 }
 
 async function putViews(views: string, id: number) {

@@ -44,7 +44,7 @@ userRouter.get("/success", function (req, res) {
     .then((response) => {
       res.send({ userData: response.data });
     })
-    .catch((error) => console.log(error.message));
+    .catch((error) => {});
 });
 
 export default userRouter;
