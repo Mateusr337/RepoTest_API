@@ -9,6 +9,9 @@ import teachersService from "./teachersService.js";
 async function insert(body: any, file: any) {
   const { category, teacher, discipline, name } = body;
 
+  if (!file) throw errors.badRequestError("don't send file");
+  if (file.mimetype !== "application/pdf") throw errors.badRequestError("wrong file type");
+
   const foundCategory = await categoryService.getByName(category);
   if (!foundCategory) throw errors.notFoundError("category");
 

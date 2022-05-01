@@ -12,8 +12,8 @@ async function truncate(table: string) {
   await client.$executeRawUnsafe(`TRUNCATE TABLE ${table};`);
 }
 
-afterEach(async () => client.$disconnect());
 beforeEach((done) => done());
+afterEach(async () => client.$disconnect());
 
 describe("testing page: /sign-up", () => {
   beforeEach(async () => await truncate("users"));
@@ -104,6 +104,21 @@ describe("testing page: /sign-in", () => {
   });
 });
 
+describe("testing authentication after github login", () => {
+  beforeEach(async () => await truncate("users"));
+
+  describe("POST /login/github", () => {
+    it("should answer with token", async () => {
+      const user = await createUserData();
+
+      const response = await agent.post("/login/github").send({ email: user.email });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.token).not.toBeNull();
+    });
+  });
+});
+
 describe("testing router: /categories", () => {
   describe("GET /categories", () => {
     it("should answer with not null array", async () => {
@@ -137,6 +152,19 @@ describe("testing router: /disciplines", () => {
 
       expect(response.status).toEqual(200);
       expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it("should answer with not null array - term filter", async () => {
+      const { headers } = await CreateUserToken();
+
+      const discipline = await client.disciplines.findFirst();
+
+      const response = await agent
+        .get(`/disciplines?term=${discipline.term}`)
+        .set({ Authorization: headers.Authorization });
+
+      expect(response.status).toEqual(200);
+      expect(response.body.length).not.toBeNull();
     });
 
     it("should answer with status code 401", async () => {
@@ -193,6 +221,44 @@ describe("testing router: /tests", () => {
 
       const tests = await client.tests.count();
       expect(tests).toEqual(1);
+    });
+
+    it("should answer with status code 422 - wrong type file", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("png.png");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", category.name)
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", pdf);
+
+      expect(response.status).toEqual(422);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
+    });
+
+    it("should answer with status code 422 - don't send file", async () => {
+      const { user, headers } = await CreateUserToken();
+      const { category, discipline, teacher, name, pdf } = await createInsertTestData("pdf.pdf");
+
+      const response = await agent
+        .post("/tests")
+        .set({ Authorization: headers.Authorization, "Content-Type": "multipart/form-data" })
+        .field("discipline", discipline.name)
+        .field("category", category.name)
+        .field("teacher", teacher.name)
+        .field("name", name)
+        .attach("pdf", "");
+
+      expect(response.status).toEqual(422);
+
+      const tests = await client.tests.count();
+      expect(tests).toEqual(0);
     });
 
     it("should answer with status code 401", async () => {
@@ -363,6 +429,24 @@ describe("testing router: /tests", () => {
 
       expect(responseSearch.status).toEqual(200);
       expect(responseSearch.body).not.toBeNull();
+    });
+  });
+
+  describe("PUT /test/:id ", () => {
+    it("should answer with status code 204 - views", async () => {
+      const { user, headers, test } = await insertTestCreateUserToken();
+
+      const newViews = parseInt(test.views) + 1;
+
+      const response = await agent
+        .put(`/tests/${test.id}`)
+        .set({ ...headers })
+        .send({ views: newViews });
+
+      const { views } = await client.tests.findFirst();
+
+      expect(response.status).toEqual(204);
+      expect(views).toEqual(newViews.toString());
     });
   });
 });

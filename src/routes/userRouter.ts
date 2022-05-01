@@ -10,9 +10,9 @@ const userRouter = Router();
 userRouter.post("/register", validateSchemaMiddleware(userSchema), userController.register);
 userRouter.post("/login", validateSchemaMiddleware(userSchema), userController.login);
 userRouter.post("/login/github", userController.loginWithGithub);
-userRouter.get("/validateAuth", validateAuth, (req: Request, res: Response) => {
-  res.sendStatus(200);
-});
+// userRouter.get("/validateAuth", validateAuth, (req: Request, res: Response) => {
+//   res.sendStatus(200);
+// });
 
 userRouter.get("/github/callback", (req, res) => {
   const requestToken = req.query.code;
