@@ -38,6 +38,7 @@ Front end in: https://github.com/Mateusr337/RepoTest
    <img src="https://img.shields.io/badge/jest-C21325?style=for-the-badge&logo=jest&logoColor=000000"/>
   <img src="https://img.shields.io/badge/supertest-141526?style=for-the-badge&logo=jest&logoColor=ffffff"/>
   <img src="https://img.shields.io/badge/supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=ffffff"/>
+
 </p>
 <br>  
 
