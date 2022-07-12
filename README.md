@@ -1,11 +1,11 @@
 # RepoTest
 
 
-##  :link: About
+##  :link: Sobre
 
-RepoTest is a mobile-ready desktop application with password login or github.
-Where you could post pdf's of college tests with suggestive inputs (teacher, discipline, category), you can see the tests by professor or by term/discipline, as well as the 2 separate research inputs on their respective screens.
-When a user adds a test, all other users receive an email with the link and data, and each test (file) lives on a server in subase.
+O RepoTest é um aplicativo de desktop pronto para dispositivos móveis com login por senha ou github.
+Onde você pode postar pdf's de provas de faculdade com entradas sugestivas (professor, disciplina, categoria), você pode ver as provas por professor ou por período/disciplina, bem como as 2 entradas de pesquisa separadas em suas respectivas telas.
+Quando um usuário adiciona um teste, todos os outros usuários recebem um e-mail com o link e os dados, e cada teste (arquivo) fica em um servidor em subase.
 
 Front end in: https://github.com/Mateusr337/RepoTest
 
@@ -25,7 +25,7 @@ Front end in: https://github.com/Mateusr337/RepoTest
  
 :ballot_box_with_check: `disciplines` you can post and get tests. And sarch for tests by teachers or disciplines
 
-## :woman_technologist: Technologies
+## :woman_technologist: Tecnologias
 
 <p align="center">
   <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
@@ -42,19 +42,19 @@ Front end in: https://github.com/Mateusr337/RepoTest
 </p>
 <br>  
 
-## :tada: How to run
+## :tada: Inicialização
 
 ```
-# Clone this repo
+# Clone esse repo
 $ git clone https://github.com/Mateusr337/RepoTest_API.git
 
-# Clone the front-end repository and follow the instructions to run
+# Clone o front-end repo 
 $ git clone https://github.com/Mateusr337/RepoTest.git
 
-# install the dependencies
+# instale as dependências
 $ npm i
 
-# to run in dev
+# Inicialize em desenvolvimento
 $ npm run dev
 ```
 
